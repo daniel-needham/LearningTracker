@@ -1,0 +1,15 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: "import java.util.Scanner;\n\npublic class Main {\n    public static void\
+    \ main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n \
+    \       Object msg = scanner.nextLine();    \n\n        // Write your code here\n\
+    \    }\n}"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/18723#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: Sat, 24 Sep 2022 12:07:28 UTC
+record: -1

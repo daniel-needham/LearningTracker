@@ -1,0 +1,7 @@
+content:
+- Theory
+- Mutation trick in HashMap
+- System.identityHashCode(Object x) vs hashCode()
+- Unique pairs in HashMap
+- Duplicate elements in HashSet
+- HashSet and mutations
