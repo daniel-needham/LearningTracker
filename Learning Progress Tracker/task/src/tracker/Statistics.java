@@ -1,38 +1,65 @@
 package tracker;
 
-import java.util.LinkedHashSet;
-import java.util.Scanner;
+import java.util.*;
 
 public class Statistics {
 
     LinkedHashSet<Student> studentSet;
+    HashMap<CourseNames, Course> currentCoursesMap;
+
 
     public Statistics(StudentManager studentManager) {
-        studentSet = studentManager.getListOfStudents();
+
+        studentSet = studentManager.getStudentSet();
+        currentCoursesMap = studentManager.getCurrentCoursesMap();
     }
 
     public void startCommandLineInterface(Scanner scanner) {
-        return;
+        System.out.println(String.format("""
+                        Most popular: %s\s
+                        Least popular: %s\s
+                        Highest activity: \s
+                        Lowest activity: \s
+                        Easiest course: \s
+                        Hardest course:""",
+        calculateMostPopular(),calculateLeastPopular()));
+
+
     }
 
     private String calculateMostPopular() {
-       int[] enrolled = new int[4];
-        for (Student student: studentSet) {
-            int[] points = student.returnPointsInArray();
-            for (int i = 0; i < points.length; i++) {
-                if (points[i] > 0 ) {
-                    enrolled[i]++;
-                }
-            }
+        String returnString;
+        Optional<Map.Entry<CourseNames, Course>> mostPopular = currentCoursesMap.entrySet()
+                .stream()
+                .max(Comparator.comparing((Entry) -> {
+                    return Entry.getValue().amountsOfEnrolledStudents();
+                }));
+        try {
+            Map.Entry<CourseNames,Course> mostPopularEntry = mostPopular.orElseThrow(NullPointerException::new);
+            returnString = mostPopularEntry.getKey().label;
+        } catch (NullPointerException e) {
+            returnString = "N/A";
         }
-
+        return returnString;
     }
 
     private String calculateLeastPopular(){
-
+        String returnString;
+        Optional<Map.Entry<CourseNames, Course>> leastPopular = currentCoursesMap.entrySet()
+                .stream()
+                .min(Comparator.comparing((Entry) -> {
+                    return Entry.getValue().amountsOfEnrolledStudents();
+                }));
+        try {
+            Map.Entry<CourseNames,Course> leastPopularEntry = leastPopular.orElseThrow(NullPointerException::new);
+            returnString = leastPopularEntry.getKey().label;
+        } catch (NullPointerException e) {
+            returnString = "N/A";
+        }
+        return returnString;
     }
 
-    private String calculateHighestActivity(){
+   private String calculateHighestActivity(){
 
     }
 
@@ -40,11 +67,12 @@ public class Statistics {
 
     }
 
+    /*
     private String easiestCourse(){
 
     }
 
     private String hardestCourse(){
 
-    }
+    }*/
 }

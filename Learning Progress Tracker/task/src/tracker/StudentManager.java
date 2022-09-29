@@ -1,18 +1,22 @@
 package tracker;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static tracker.InputMatch.*;
 
 
 public class StudentManager {
 
-    private LinkedHashSet<Student> listOfStudents;
+    private LinkedHashSet<Student> studentSet;
+    private HashMap<CourseNames, Course> currentCoursesMap;
+
 
     public StudentManager() {
-        listOfStudents = new LinkedHashSet<>() {
-        };
+        studentSet = new LinkedHashSet<>();
+        currentCoursesMap = new HashMap<>();
+        for (CourseNames courseName : CourseNames.values()) {
+            currentCoursesMap.put(courseName, new Course(courseName));
+        }
     }
 
     public void addToList(String firstName,
@@ -20,7 +24,7 @@ public class StudentManager {
                           String email) throws IllegalArgumentException {
 
 
-        boolean success = listOfStudents.add(new Student(firstName,
+        boolean success = studentSet.add(new Student(firstName,
                 lastName,
                 email, generateID()));
 
@@ -84,7 +88,7 @@ public class StudentManager {
         }
     }
 
-    public void addPointsFromCommandLine(Scanner scanner){
+    public void addPointsFromCommandLine(Scanner scanner) {
         System.out.println("Enter an id and points or 'back' to return");
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -100,13 +104,20 @@ public class StudentManager {
                 String id = inputs[0];
                 try {
                     Student found = findStudentByID(id);
-                    found.addPoints(Arrays.stream(inputs).skip(1)
+                    int[] inputsAsPointsArray = Arrays.stream(inputs).skip(1)
                             .mapToInt(Integer::valueOf)
-                            .toArray());
+                            .toArray();
+                    ArrayList<CourseNames> enrolledCourses =
+                            found.getPoints().addPointsFromArray(inputsAsPointsArray);
+                    if (!enrolledCourses.isEmpty()) {
+                        for (CourseNames courseName : enrolledCourses) {
+                            currentCoursesMap.get(courseName).addStudentToCourse(found);
+                        }
+                    }
                     System.out.println("Points updated");
-                //id not found
+                    //id not found
                 } catch (NoSuchElementException e) {
-                    System.out.println(String.format("No student is found for id=%s",id));
+                    System.out.println(String.format("No student is found for id=%s", id));
                 }
                 continue;
             }
@@ -116,7 +127,7 @@ public class StudentManager {
         }
     }
 
-    public void findStudentFromCommandLine(Scanner scanner){
+    public void findStudentFromCommandLine(Scanner scanner) {
         System.out.println("Enter an id and points or 'back' to return");
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -130,7 +141,7 @@ public class StudentManager {
             if (command.matches("[0-9]+")) {
                 try {
                     Student found = findStudentByID(command);
-                    System.out.println(found.getPoints());
+                    System.out.println(found.getPointsAsString());
                     continue;
                 } catch (Exception ignored) {
 
@@ -144,28 +155,56 @@ public class StudentManager {
 
 
     public void listAllStudents() {
-        if (listOfStudents.isEmpty()) {
+        if (studentSet.isEmpty()) {
             System.out.println("No students found.");
         } else {
             System.out.println("Students:");
-            listOfStudents.forEach(System.out::println);
+            studentSet.forEach(System.out::println);
         }
     }
 
     public Student findStudentByID(String id) throws NoSuchElementException {
-        return listOfStudents.stream().filter(s -> s.getId().equals(id))
+        return studentSet.stream().filter(s -> s.getId().equals(id))
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
     }
 
+    public void addPointsFromArrayForTesting(String command) {
+        if (matchAddPoints(command)) {
+            String[] inputs = command.split(" ");
+            String id = inputs[0];
+            try {
+                Student found = findStudentByID(id);
+                int[] inputsAsPointsArray = Arrays.stream(inputs).skip(1)
+                        .mapToInt(Integer::valueOf)
+                        .toArray();
+                ArrayList<CourseNames> enrolledCourses =
+                        found.getPoints().addPointsFromArray(inputsAsPointsArray);
+                if (!enrolledCourses.isEmpty()) {
+                    for (CourseNames courseName : enrolledCourses) {
+                        currentCoursesMap.get(courseName).addStudentToCourse(found);
+                    }
+                }
+                System.out.println("Points updated");
+                //id not found
+            } catch (NoSuchElementException e) {
+                System.out.println(String.format("No student is found for id=%s", id));
+            }
+        }
+    }
+
+    public LinkedHashSet<Student> getStudentSet() {
+        return studentSet;
+    }
+
+    public HashMap<CourseNames, Course> getCurrentCoursesMap() {
+        return currentCoursesMap;
+    }
 
     private String generateID() {
-        int id = listOfStudents.size() + 1;
+        int id = studentSet.size() + 1;
         id = 1000 + id;
         return Integer.toString(id);
     }
 
-    public LinkedHashSet<Student> getListOfStudents() {
-        return listOfStudents;
-    }
 }

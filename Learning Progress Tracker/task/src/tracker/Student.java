@@ -1,8 +1,5 @@
 package tracker;
 
-import java.util.List;
-import java.util.UUID;
-
 public class Student {
 
     private final String id;
@@ -10,7 +7,7 @@ public class Student {
     private final String lastName;
     private final String email;
 
-    private int javaPoints, dsaPoints, databasesPoints, springPoints;
+    private CoursePoints points;
 
 
     public Student(String firstName,
@@ -21,22 +18,16 @@ public class Student {
         this.lastName = lastName;
         this.email = email;
         this.id = id;
-        javaPoints = dsaPoints = databasesPoints = springPoints = 0;
+        points = new CoursePoints();
     }
 
-    public void addPoints(int[] inputs) {
-        javaPoints = javaPoints + inputs[0];
-        dsaPoints = dsaPoints + inputs[1];
-        databasesPoints = databasesPoints +inputs[2];
-        springPoints = springPoints + inputs[3];
-    }
-
-    public String getPoints() {
-        return String.format("%s points: Java=%d; DSA=%d; Databases=%d; Spring=%d", id, javaPoints, dsaPoints, databasesPoints, springPoints);
+    public String getPointsAsString() {
+        return String.format("%s points: Java=%d; DSA=%d; Databases=%d; Spring=%d", id, points.getCoursePoints(CourseNames.JAVA),
+                points.getCoursePoints(CourseNames.DSA), points.getCoursePoints(CourseNames.DATABASES), points.getCoursePoints(CourseNames.SPRING));
     }
 
     public int[] returnPointsInArray(){
-        return new int[]{javaPoints, dsaPoints, databasesPoints, springPoints};
+        return points.getCoursePointsArray();
     }
 
     public String getId() {
@@ -53,6 +44,10 @@ public class Student {
 
     public String getEmail() {
         return email;
+    }
+
+    public CoursePoints getPoints() {
+        return points;
     }
 
     @Override
