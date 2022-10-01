@@ -44,7 +44,41 @@ class StatisticsTest {
     }
 
     public static List<String> pointsUpdateFactory() {
-        return List.of("1001 5 5 5 0", "1002 10 100 5 0", "1003 10 0 0 0", "1004 100 4 4 0", "1005 10 5 10000 1");
+        return List.of("1001 4 0 0 8", "1002 0 0 0 5", "1003 0 8 0 4", "1004 0 0 0 0", "1005 0 0 0 0");
     }
 
+    @Test
+    void calculateMostPopularTest() {
+        assertEquals("Spring", statistics.calculateMostPopular());
+    }
+
+    @Test
+    void calculateLeastPopularTest() {
+        assertEquals("Databases", statistics.calculateLeastPopular());
+    }
+
+    @Test
+    void calculateHighestActivityTest() {
+        assertEquals("Spring", statistics.calculateHighestActivity());
+    }
+
+    @Test
+    void calculateLowestActivityTest() {
+        assertEquals("Databases", statistics.calculateLowestActivity());
+    }
+
+    @Test
+    void calculateEasiestCourseTest() {
+        assertEquals("DSA", statistics.calculateEasiestCourse());
+    }
+
+    @Test
+    void calculateHardestCourseTest() {
+        assertEquals("Java", statistics.calculateHardestCourse());
+    }
+
+    @Test
+    void returnTopLearnersTestTest() {
+        assertEquals("100110021003", statistics.returnTopLearnersTest(CourseNames.SPRING));
+    }
 }

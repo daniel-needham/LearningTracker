@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CoursePoints {
-    
+
     private HashMap<CourseNames, int[]> coursesPointsMap;
-    
+
     public CoursePoints() {
         coursesPointsMap = new HashMap<>(4);
-        for (CourseNames course: CourseNames.values()) {
-            coursesPointsMap.put(course,new int[]{0,0});
+        for (CourseNames course : CourseNames.values()) {
+            coursesPointsMap.put(course, new int[]{0, 0});
         }
     }
 
@@ -25,7 +25,8 @@ public class CoursePoints {
 
             if (addPointsForCourse(CourseNames.values()[i], points[i])) {
                 enrolledCourses.add(CourseNames.values()[i]);
-            };
+            }
+            ;
         }
         return enrolledCourses;
     }
@@ -38,7 +39,7 @@ public class CoursePoints {
                 enrolled.set(true);
             }
             val[0] = val[0] + points;
-            val[1]++;
+            if (points > 0) val[1]++;
             return val;
         });
         return enrolled.get();

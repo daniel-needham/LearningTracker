@@ -2,15 +2,16 @@ package tracker;
 
 public enum CourseNames {
 
-    JAVA("Java"),
-    DSA("DSA"),
-    DATABASES("Databases"),
-    SPRING("Spring");
+    JAVA("Java", 600),
+    DSA("DSA", 400),
+    DATABASES("Databases", 480),
+    SPRING("Spring", 550);
 
     public final String label;
+    public final int completedPoints;
 
-
-    CourseNames(String label) {
+    CourseNames(String label, int completedPoints) {
         this.label = label;
+        this.completedPoints = completedPoints;
     }
 }

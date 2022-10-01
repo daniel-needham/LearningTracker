@@ -26,12 +26,16 @@ public class Student {
                 points.getCoursePoints(CourseNames.DSA), points.getCoursePoints(CourseNames.DATABASES), points.getCoursePoints(CourseNames.SPRING));
     }
 
-    public int[] returnPointsInArray(){
+    public int[] returnPointsInArray() {
         return points.getCoursePointsArray();
     }
 
     public String getId() {
         return id;
+    }
+
+    public int getIdInt() {
+        return Integer.parseInt(id);
     }
 
     public String getFirstName() {
@@ -69,4 +73,6 @@ public class Student {
     public String toString() {
         return id;
     }
+
+
 }
