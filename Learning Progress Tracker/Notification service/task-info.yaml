@@ -1310,6 +1310,708 @@ files:
         }
     }
   learner_created: false
+- name: src/tracker/Statistics.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.math.BigDecimal;
+    import java.math.RoundingMode;
+    import java.util.*;
+    import java.util.stream.Collectors;
+
+
+    public class Statistics {
+
+        LinkedHashSet<Student> studentSet;
+        HashMap<CourseNames, Course> currentCoursesMap;
+
+
+        public Statistics(StudentManager studentManager) {
+
+            studentSet = studentManager.getStudentSet();
+            currentCoursesMap = studentManager.getCurrentCoursesMap();
+        }
+
+        public void startCommandLineInterface(Scanner scanner) {
+            String mostPop, leastPop, highestActiv, lowestActiv, easiestCourse, hardestCourse;
+            if (currentCoursesMap.values().stream().allMatch(course -> course.amountsOfEnrolledStudents() == 0)){
+                mostPop = "n/a";
+                leastPop = "n/a";
+                highestActiv = "n/a";
+                lowestActiv = "n/a";
+                easiestCourse = "n/a";
+                hardestCourse = "n/a";
+            } else {
+                mostPop = calculateMostPopular();
+                leastPop = calculateLeastPopular();
+                highestActiv = calculateHighestActivity();
+                lowestActiv = calculateLowestActivity();
+                easiestCourse = calculateEasiestCourse();
+                hardestCourse = calculateHardestCourse();
+            }
+            System.out.println("Type the name of a course to see details or 'back' to quit:");
+            System.out.println(String.format("""
+                            Most popular: %s\s
+                            Least popular: %s\s
+                            Highest activity: %s\s
+                            Lowest activity: %s\s
+                            Easiest course: %s\s
+                            Hardest course: %s""",
+                    mostPop, leastPop, highestActiv, lowestActiv, easiestCourse, hardestCourse));
+
+            inputRead: while (scanner.hasNextLine()) {
+                String command = scanner.nextLine();
+
+                //back
+                if (Objects.equals(command.toLowerCase(), "back")) {
+                    break;
+                }
+
+                //print stats on
+                for (CourseNames course : CourseNames.values()) {
+                    if (command.equals(course.label)) {
+                        printTopLearners(course);
+                        continue inputRead;
+                    }
+                }
+
+                //inputted course doesn't match
+                System.out.println("Unknown course.");
+            }
+        }
+
+        public String calculateMostPopular() {
+            int mostEnrolledStudents = currentCoursesMap.values()
+                    .stream()
+                    .mapToInt(Course::amountsOfEnrolledStudents)
+                    .max()
+                    .orElse(-1);
+           return currentCoursesMap.values()
+                   .stream()
+                   .filter(c -> c.amountsOfEnrolledStudents() == mostEnrolledStudents)
+                   .map(c -> c.getCourseName().label)
+                   .collect(Collectors.joining(", "));
+        }
+
+        public String calculateLeastPopular() {
+            String returnString;
+            int leastEnrolledStudents = currentCoursesMap.values()
+                    .stream()
+                    .mapToInt(Course::amountsOfEnrolledStudents)
+                    .max()
+                    .orElse(-1);
+            List<String> courseNamesList = currentCoursesMap.values()
+                    .stream()
+                    .filter(c -> c.amountsOfEnrolledStudents() == leastEnrolledStudents)
+                    .map(c -> c.getCourseName().label)
+                    .toList();
+            if (courseNamesList.size() > 1) {
+                returnString = "n/a";
+            } else {
+                returnString = courseNamesList.get(0);
+            }
+            return returnString;
+        }
+
+        public String calculateHighestActivity() {
+            int highestTotalAssignments = currentCoursesMap.values()
+                    .stream()
+                    .mapToInt(Course::getTotalAssignmentsForCourse)
+                    .max()
+                    .orElse(-1);
+            return currentCoursesMap.values()
+                    .stream()
+                    .filter(c -> c.getTotalAssignmentsForCourse() == highestTotalAssignments)
+                    .map(c -> c.getCourseName().label)
+                    .collect(Collectors.joining(", "));
+        }
+
+        public String calculateLowestActivity() {
+            String returnString;
+            int lowestTotalAssignments = currentCoursesMap.values()
+                    .stream()
+                    .mapToInt(Course::getTotalAssignmentsForCourse)
+                    .min()
+                    .orElse(-1);
+            List<String> lowestActivityAsStrings = currentCoursesMap.values()
+                    .stream()
+                    .filter(c -> c.getTotalAssignmentsForCourse() == lowestTotalAssignments)
+                    .map(c -> c.getCourseName().label)
+                    .toList();
+            if (lowestActivityAsStrings.size() > 1) {
+                returnString = "n/a";
+            } else {
+                returnString = lowestActivityAsStrings.get(0);
+            }
+            return returnString;
+        }
+
+
+        public String calculateEasiestCourse() {
+            Optional<Map.Entry<CourseNames, Integer>> maxOptional = getTotalAverageAssignmentScoreHashMap().entrySet().stream()
+                    .filter((entry) -> entry.getValue() != 0)
+                    .max(Comparator.comparing(Map.Entry::getValue));
+            String returnString;
+            try {
+                Map.Entry<CourseNames, Integer> max = maxOptional.orElseThrow(NullPointerException::new);
+                returnString = max.getKey().label;
+            } catch (NullPointerException e) {
+                returnString = "n/a";
+            }
+            return returnString;
+        }
+
+        public String calculateHardestCourse() {
+            Optional<Map.Entry<CourseNames, Integer>> minOptional = getTotalAverageAssignmentScoreHashMap().entrySet().stream()
+                    .filter((entry) -> entry.getValue() != 0)
+                    .min(Comparator.comparing(Map.Entry::getValue));
+            String returnString;
+            try {
+                Map.Entry<CourseNames, Integer> min = minOptional.orElseThrow(NullPointerException::new);
+                returnString = min.getKey().label;
+            } catch (NullPointerException e) {
+                returnString = "n/a";
+            }
+            return returnString;
+        }
+
+        private HashMap<CourseNames, int[]> createCourseNamesHashMapArr() {
+            HashMap<CourseNames, int[]> averageScorePerAssignment = new HashMap<>();
+            averageScorePerAssignment.put(CourseNames.JAVA, new int[]{0, 0});
+            averageScorePerAssignment.put(CourseNames.DSA, new int[]{0, 0});
+            averageScorePerAssignment.put(CourseNames.DATABASES, new int[]{0, 0});
+            averageScorePerAssignment.put(CourseNames.SPRING, new int[]{0, 0});
+            return averageScorePerAssignment;
+        }
+
+        private HashMap<CourseNames, Integer> createCourseNamesHashMapInt() {
+            HashMap<CourseNames, Integer> averageScorePerAssignment = new HashMap<>();
+            averageScorePerAssignment.put(CourseNames.JAVA, 0);
+            averageScorePerAssignment.put(CourseNames.DSA, 0);
+            averageScorePerAssignment.put(CourseNames.DATABASES, 0);
+            averageScorePerAssignment.put(CourseNames.SPRING, 0);
+            return averageScorePerAssignment;
+        }
+
+        private HashMap<CourseNames, Integer> getTotalAverageAssignmentScoreHashMap() {
+            HashMap<CourseNames, int[]> pointsAssignmentsMap = createCourseNamesHashMapArr();
+            for (Student student : studentSet) {
+                for (CourseNames course : CourseNames.values()) {
+                    pointsAssignmentsMap.computeIfPresent(course, (key, val) -> {
+                        val[0] = val[0] + student.getPoints().getCoursePoints(course);
+                        val[1] = val[1] + student.getPoints().getCourseAssignments(course);
+                        return val;
+                    });
+                }
+            }
+            HashMap<CourseNames, Integer> averagePointsPerAssignmentMap = createCourseNamesHashMapInt();
+            for (CourseNames course: CourseNames.values()) {
+                int average = 0;
+                if (pointsAssignmentsMap.get(course)[1] > 0) {
+                    average = pointsAssignmentsMap.get(course)[0] / pointsAssignmentsMap.get(course)[1];
+                }
+                averagePointsPerAssignmentMap.put(course,average);
+            }
+            return averagePointsPerAssignmentMap;
+        }
+
+        public void printTopLearners(CourseNames course) {
+            Course selectedCourse = currentCoursesMap.get(course);
+            List<Student> enrolledStudents = selectedCourse.getEnrolledStudents();
+            enrolledStudents.sort(new topLearnerComparator(course));
+            //print
+            System.out.println(course.label);
+            System.out.println(String.format("id\tpoints\tcompleted"));
+            for (Student student: enrolledStudents) {
+                int totalPoints = student.getPoints().getCoursePoints(course);
+                double d = ((double) totalPoints / (double) selectedCourse.completedPoints) * 100;
+                BigDecimal decimal = new BigDecimal(d).setScale(1, RoundingMode.HALF_UP);
+                System.out.printf("%s\t%d\t%s%%%n", student.getId(), totalPoints,decimal.toString());
+            }
+        }
+        public String returnTopLearnersTest(CourseNames course) {
+            Course selectedCourse = currentCoursesMap.get(course);
+            List<Student> enrolledStudents = selectedCourse.getEnrolledStudents();
+            enrolledStudents.sort(new topLearnerComparator(course));
+            StringBuilder sb = new StringBuilder();
+            enrolledStudents.forEach(sb::append);
+            return sb.toString();
+
+        }
+
+        private static class topLearnerComparator implements Comparator<Student> {
+
+            CourseNames course;
+
+            topLearnerComparator(CourseNames course) {
+                this.course = course;
+            }
+
+            @Override
+            public int compare(Student o1, Student o2) {
+
+                int pointsCompare = Integer.compare(o2.getPoints().getCoursePoints(course), o1.getPoints().getCoursePoints(course));
+                int idCompare = Integer.compare(o1.getIdInt(),o2.getIdInt());
+
+                return (pointsCompare == 0) ? idCompare : pointsCompare;
+            }
+        }
+    }
+  learner_created: true
+- name: src/tracker/StudentManager.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.*;
+
+    import static tracker.InputMatch.*;
+
+
+    public class StudentManager {
+
+        private LinkedHashSet<Student> studentSet;
+        private HashMap<CourseNames, Course> currentCoursesMap;
+
+
+        public StudentManager() {
+            studentSet = new LinkedHashSet<>();
+            currentCoursesMap = new HashMap<>();
+            for (CourseNames courseName : CourseNames.values()) {
+                currentCoursesMap.put(courseName, new Course(courseName));
+            }
+        }
+
+        public void addToList(String firstName,
+                              String lastName,
+                              String email) throws IllegalArgumentException {
+
+
+            boolean success = studentSet.add(new Student(firstName,
+                    lastName,
+                    email, generateID()));
+
+            if (!success) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        public void addStudentFromCommandLine(Scanner scanner) {
+            System.out.println("Enter student credentials or 'back' to return:");
+            int studentsAddedInSession = 0;
+            while (scanner.hasNextLine()) {
+                String command = scanner.nextLine();
+
+                //back
+                if (Objects.equals(command.toLowerCase(), "back")) {
+                    String message = "Total " + studentsAddedInSession + " students have been added";
+                    System.out.println(message);
+                    break;
+                }
+
+                String[] splitBySpace = command.split(" ");
+
+                //incorrect credentials
+                if (command.isEmpty() || command.isBlank() || splitBySpace.length < 3) {
+                    System.out.println("Incorrect credentials");
+                    continue;
+                }
+
+                //break string into parts
+                String firstName = splitBySpace[0];
+                String lastName = String.join(" ", Arrays.copyOfRange(splitBySpace, 1, splitBySpace.length - 1));
+                String email = splitBySpace[splitBySpace.length - 1];
+
+                //all match add student to list
+                if (matchFirstName(firstName) && matchLastName(lastName) && matchEmail(email)) {
+                    try {
+                        addToList(firstName, lastName, email);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("This email is already taken.");
+                        continue;
+                    }
+                    studentsAddedInSession++;
+                    System.out.println("The student has been added.");
+                    continue;
+                }
+
+                if (!matchFirstName(firstName)) {
+                    System.out.println("Incorrect first name.");
+                    continue;
+                }
+
+                if (!matchLastName(lastName)) {
+                    System.out.println("Incorrect last name.");
+                    continue;
+                }
+                if (!matchEmail(email)) {
+                    System.out.println("Incorrect email.");
+                }
+
+            }
+        }
+
+        public void addPointsFromCommandLine(Scanner scanner) {
+            System.out.println("Enter an id and points or 'back' to return");
+            while (scanner.hasNextLine()) {
+                String command = scanner.nextLine();
+
+                //back
+                if (Objects.equals(command.toLowerCase(), "back")) {
+                    break;
+                }
+
+                //input matches
+                if (matchAddPoints(command)) {
+                    String[] inputs = command.split(" ");
+                    String id = inputs[0];
+                    try {
+                        Student found = findStudentByID(id);
+                        int[] inputsAsPointsArray = Arrays.stream(inputs).skip(1)
+                                .mapToInt(Integer::valueOf)
+                                .toArray();
+                        ArrayList<CourseNames> enrolledCourses =
+                                found.getPoints().addPointsFromArray(inputsAsPointsArray);
+                        if (!enrolledCourses.isEmpty()) {
+                            for (CourseNames courseName : enrolledCourses) {
+                                currentCoursesMap.get(courseName).addStudentToCourse(found);
+                            }
+                        }
+                        System.out.println("Points updated");
+                        //id not found
+                    } catch (NoSuchElementException e) {
+                        System.out.println(String.format("No student is found for id=%s", id));
+                    }
+                    continue;
+                }
+
+                //incorrect entry default
+                System.out.println("Incorrect points format.");
+            }
+        }
+
+        public void findStudentFromCommandLine(Scanner scanner) {
+            System.out.println("Enter an id and points or 'back' to return");
+            while (scanner.hasNextLine()) {
+                String command = scanner.nextLine();
+
+                //back
+                if (Objects.equals(command.toLowerCase(), "back")) {
+                    break;
+                }
+
+                //input in correct format
+                if (command.matches("[0-9]+")) {
+                    try {
+                        Student found = findStudentByID(command);
+                        System.out.println(found.getPointsAsString());
+                        continue;
+                    } catch (Exception ignored) {
+
+                    }
+                }
+
+                //incorrect entry default
+                System.out.println(String.format("No student is found for id=%s.", command));
+            }
+        }
+
+
+        public void listAllStudents() {
+            if (studentSet.isEmpty()) {
+                System.out.println("No students found.");
+            } else {
+                System.out.println("Students:");
+                studentSet.forEach(System.out::println);
+            }
+        }
+
+        public Student findStudentByID(String id) throws NoSuchElementException {
+            return studentSet.stream().filter(s -> s.getId().equals(id))
+                    .findFirst()
+                    .orElseThrow(NoSuchElementException::new);
+        }
+
+        public void addPointsFromArrayForTesting(String command) {
+            if (matchAddPoints(command)) {
+                String[] inputs = command.split(" ");
+                String id = inputs[0];
+                try {
+                    Student found = findStudentByID(id);
+                    int[] inputsAsPointsArray = Arrays.stream(inputs).skip(1)
+                            .mapToInt(Integer::valueOf)
+                            .toArray();
+                    ArrayList<CourseNames> enrolledCourses =
+                            found.getPoints().addPointsFromArray(inputsAsPointsArray);
+                    if (!enrolledCourses.isEmpty()) {
+                        for (CourseNames courseName : enrolledCourses) {
+                            currentCoursesMap.get(courseName).addStudentToCourse(found);
+                        }
+                    }
+                    System.out.println("Points updated");
+                    //id not found
+                } catch (NoSuchElementException e) {
+                    System.out.println(String.format("No student is found for id=%s", id));
+                }
+            }
+        }
+
+        public LinkedHashSet<Student> getStudentSet() {
+            return studentSet;
+        }
+
+        public HashMap<CourseNames, Course> getCurrentCoursesMap() {
+            return currentCoursesMap;
+        }
+
+        private String generateID() {
+            int id = studentSet.size() + 1;
+            id = 1000 + id;
+            return Integer.toString(id);
+        }
+
+    }
+  learner_created: true
+- name: src/tracker/Student.java
+  visible: true
+  text: |
+    package tracker;
+
+    public class Student {
+
+        private final String id;
+        private final String firstName;
+        private final String lastName;
+        private final String email;
+
+        private CoursePoints points;
+
+
+        public Student(String firstName,
+                       String lastName,
+                       String email,
+                       String id) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.email = email;
+            this.id = id;
+            points = new CoursePoints();
+        }
+
+        public String getPointsAsString() {
+            return String.format("%s points: Java=%d; DSA=%d; Databases=%d; Spring=%d", id, points.getCoursePoints(CourseNames.JAVA),
+                    points.getCoursePoints(CourseNames.DSA), points.getCoursePoints(CourseNames.DATABASES), points.getCoursePoints(CourseNames.SPRING));
+        }
+
+        public int[] returnPointsInArray() {
+            return points.getCoursePointsArray();
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public int getIdInt() {
+            return Integer.parseInt(id);
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public CoursePoints getPoints() {
+            return points;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Student student = (Student) o;
+
+            return email.equals(student.email);
+        }
+
+        @Override
+        public int hashCode() {
+            return email.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return id;
+        }
+
+
+    }
+  learner_created: true
+- name: src/tracker/InputMatch.java
+  visible: true
+  text: |
+    package tracker;
+
+    public class InputMatch {
+
+        static boolean matchFirstName(String firstName) {
+            String regex = "^(?=.{2,100}$)[a-zA-Z]+(?:[-'][a-zA-Z]+)*$";
+            return firstName.matches(regex);
+        }
+
+        static boolean matchLastName(String lastName) {
+            String regex = "^(?=.{2,100}$)[a-zA-Z ]+(?:[-'][a-zA-Z ]+)*$";
+            return lastName.matches(regex);
+        }
+
+        static boolean matchEmail(String email) {
+            String emailRegex = "[a-zA-Z0-9\\.]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+";
+            return email.matches(emailRegex);
+        }
+
+        static boolean matchAddPoints(String input) {
+            String inputRegex = "[0-9a-zA-Z]+( [0-9]+){4}";
+            return input.matches(inputRegex);
+        }
+    }
+  learner_created: true
+- name: src/tracker/CourseNames.java
+  visible: true
+  text: |
+    package tracker;
+
+    public enum CourseNames {
+
+        JAVA("Java", 600),
+        DSA("DSA", 400),
+        DATABASES("Databases", 480),
+        SPRING("Spring", 550);
+
+        public final String label;
+        public final int completedPoints;
+
+        CourseNames(String label, int completedPoints) {
+            this.label = label;
+            this.completedPoints = completedPoints;
+        }
+    }
+  learner_created: true
+- name: src/tracker/Course.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.*;
+
+    public class Course {
+
+        CourseNames courseName;
+        int completedPoints;
+        private List<Student> enrolledStudents;
+
+        public Course(CourseNames courseName) {
+            this.courseName = courseName;
+            enrolledStudents = new ArrayList<>();
+            this.completedPoints = courseName.completedPoints;
+        }
+
+        public void addStudentToCourse(Student student) {
+            enrolledStudents.add(student);
+        }
+        public int amountsOfEnrolledStudents(){
+            return enrolledStudents.size();
+        }
+
+        public CourseNames getCourseName() {
+            return courseName;
+        }
+
+        public List<Student> getEnrolledStudents() {
+            return enrolledStudents;
+        }
+
+        public int getTotalAssignmentsForCourse() {
+            int totalAssignments= 0;
+            for (Student student : getEnrolledStudents()) {
+                for (CourseNames name : CourseNames.values()) {
+                    totalAssignments = totalAssignments + student.getPoints().getCourseAssignments(name);
+                }
+            }
+            return totalAssignments;
+        }
+    }
+  learner_created: true
+- name: src/tracker/CoursePoints.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.ArrayList;
+    import java.util.HashMap;
+    import java.util.concurrent.atomic.AtomicBoolean;
+
+    public class CoursePoints {
+
+        private HashMap<CourseNames, int[]> coursesPointsMap;
+
+        public CoursePoints() {
+            coursesPointsMap = new HashMap<>(4);
+            for (CourseNames course : CourseNames.values()) {
+                coursesPointsMap.put(course, new int[]{0, 0});
+            }
+        }
+
+        public ArrayList<CourseNames> addPointsFromArray(int[] points) throws IllegalArgumentException {
+            ArrayList<CourseNames> enrolledCourses = new ArrayList<>();
+            int numberOfCourses = CourseNames.values().length;
+            if (points.length > numberOfCourses) {
+                throw new IllegalArgumentException();
+            }
+            for (int i = 0; i < numberOfCourses; i++) {
+
+                if (addPointsForCourse(CourseNames.values()[i], points[i])) {
+                    enrolledCourses.add(CourseNames.values()[i]);
+                }
+                ;
+            }
+            return enrolledCourses;
+        }
+
+        //returns true, if this is the first time student has been awarded points in that course
+        private boolean addPointsForCourse(CourseNames course, int points) {
+            AtomicBoolean enrolled = new AtomicBoolean(false);
+            coursesPointsMap.compute(course, (key, val) -> {
+                if (val[0] == 0 && points > 0) {
+                    enrolled.set(true);
+                }
+                val[0] = val[0] + points;
+                if (points > 0) val[1]++;
+                return val;
+            });
+            return enrolled.get();
+        }
+
+        public int getCoursePoints(CourseNames course) {
+            return coursesPointsMap.get(course)[0];
+        }
+
+        public int[] getCoursePointsArray() {
+            return coursesPointsMap.values().stream().mapToInt((arr) -> arr[0]).toArray();
+        }
+
+        public int getCourseAssignments(CourseNames course) {
+            return coursesPointsMap.get(course)[1];
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/14400#comment
 status: Unchecked
 record: -1

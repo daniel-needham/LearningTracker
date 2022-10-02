@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 public class Statistics {
 
@@ -21,12 +21,12 @@ public class Statistics {
     public void startCommandLineInterface(Scanner scanner) {
         String mostPop, leastPop, highestActiv, lowestActiv, easiestCourse, hardestCourse;
         if (currentCoursesMap.values().stream().allMatch(course -> course.amountsOfEnrolledStudents() == 0)){
-            mostPop = "N/A";
-            leastPop = "N/A";
-            highestActiv = "N/A";
-            lowestActiv = "N/A";
-            easiestCourse = "N/A";
-            hardestCourse = "N/A";
+            mostPop = "n/a";
+            leastPop = "n/a";
+            highestActiv = "n/a";
+            lowestActiv = "n/a";
+            easiestCourse = "n/a";
+            hardestCourse = "n/a";
         } else {
             mostPop = calculateMostPopular();
             leastPop = calculateLeastPopular();
@@ -45,7 +45,7 @@ public class Statistics {
                         Hardest course: %s""",
                 mostPop, leastPop, highestActiv, lowestActiv, easiestCourse, hardestCourse));
 
-        while (scanner.hasNextLine()) {
+        inputRead: while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
 
             //back
@@ -57,6 +57,7 @@ public class Statistics {
             for (CourseNames course : CourseNames.values()) {
                 if (command.equals(course.label)) {
                     printTopLearners(course);
+                    continue inputRead;
                 }
             }
 
@@ -91,7 +92,7 @@ public class Statistics {
                 .map(c -> c.getCourseName().label)
                 .toList();
         if (courseNamesList.size() > 1) {
-            returnString = "N/A";
+            returnString = "n/a";
         } else {
             returnString = courseNamesList.get(0);
         }
@@ -112,22 +113,21 @@ public class Statistics {
     }
 
     public String calculateLowestActivity() {
-        Optional<Course> lowestActivityOptional = currentCoursesMap.values().stream()
-                .min(Comparator.comparing((course) -> {
-                    int totalAssignments = 0;
-                    for (Student student : course.getEnrolledStudents()) {
-                        for (CourseNames name : CourseNames.values()) {
-                            totalAssignments = totalAssignments + student.getPoints().getCourseAssignments(name);
-                        }
-                    }
-                    return totalAssignments;
-                }));
         String returnString;
-        try {
-            Course lowestActivity = lowestActivityOptional.orElseThrow(NullPointerException::new);
-            returnString = lowestActivity.getCourseName().label;
-        } catch (NullPointerException e) {
-            returnString = "N/A";
+        int lowestTotalAssignments = currentCoursesMap.values()
+                .stream()
+                .mapToInt(Course::getTotalAssignmentsForCourse)
+                .min()
+                .orElse(-1);
+        List<String> lowestActivityAsStrings = currentCoursesMap.values()
+                .stream()
+                .filter(c -> c.getTotalAssignmentsForCourse() == lowestTotalAssignments)
+                .map(c -> c.getCourseName().label)
+                .toList();
+        if (lowestActivityAsStrings.size() > 1) {
+            returnString = "n/a";
+        } else {
+            returnString = lowestActivityAsStrings.get(0);
         }
         return returnString;
     }
@@ -142,7 +142,7 @@ public class Statistics {
             Map.Entry<CourseNames, Integer> max = maxOptional.orElseThrow(NullPointerException::new);
             returnString = max.getKey().label;
         } catch (NullPointerException e) {
-            returnString = "N/A";
+            returnString = "n/a";
         }
         return returnString;
     }
@@ -156,7 +156,7 @@ public class Statistics {
             Map.Entry<CourseNames, Integer> min = minOptional.orElseThrow(NullPointerException::new);
             returnString = min.getKey().label;
         } catch (NullPointerException e) {
-            returnString = "N/A";
+            returnString = "n/a";
         }
         return returnString;
     }
@@ -210,9 +210,9 @@ public class Statistics {
         System.out.println(String.format("id\tpoints\tcompleted"));
         for (Student student: enrolledStudents) {
             int totalPoints = student.getPoints().getCoursePoints(course);
-            double d = (double) totalPoints / (double) selectedCourse.completedPoints;
+            double d = ((double) totalPoints / (double) selectedCourse.completedPoints) * 100;
             BigDecimal decimal = new BigDecimal(d).setScale(1, RoundingMode.HALF_UP);
-            System.out.println(String.format("%s\t%d\t" + decimal + "%", student.getId(), totalPoints));
+            System.out.printf("%s\t%d\t%s%%%n", student.getId(), totalPoints,decimal.toString());
         }
     }
     public String returnTopLearnersTest(CourseNames course) {
@@ -237,7 +237,7 @@ public class Statistics {
         public int compare(Student o1, Student o2) {
 
             int pointsCompare = Integer.compare(o2.getPoints().getCoursePoints(course), o1.getPoints().getCoursePoints(course));
-            int idCompare = Integer.compare(o2.getIdInt(),o1.getIdInt());
+            int idCompare = Integer.compare(o1.getIdInt(),o2.getIdInt());
 
             return (pointsCompare == 0) ? idCompare : pointsCompare;
         }
