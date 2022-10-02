@@ -3,6 +3,8 @@ package tracker;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Statistics {
 
@@ -64,53 +66,49 @@ public class Statistics {
     }
 
     public String calculateMostPopular() {
-        String returnString;
-        Optional<Course> mostPopular = currentCoursesMap.values()
+        int mostEnrolledStudents = currentCoursesMap.values()
                 .stream()
-                .filter((course) -> course.amountsOfEnrolledStudents() != 0)
-                .max(Comparator.comparing(Course::amountsOfEnrolledStudents));
-        try {
-            Course mostPopularEntry = mostPopular.orElseThrow(NullPointerException::new);
-            returnString = mostPopularEntry.getCourseName().label;
-        } catch (NullPointerException e) {
-            returnString = "N/A";
-        }
-        return returnString;
+                .mapToInt(Course::amountsOfEnrolledStudents)
+                .max()
+                .orElse(-1);
+       return currentCoursesMap.values()
+               .stream()
+               .filter(c -> c.amountsOfEnrolledStudents() == mostEnrolledStudents)
+               .map(c -> c.getCourseName().label)
+               .collect(Collectors.joining(", "));
     }
 
     public String calculateLeastPopular() {
         String returnString;
-        Optional<Course> leastPopular = currentCoursesMap.values()
+        int leastEnrolledStudents = currentCoursesMap.values()
                 .stream()
-                .min(Comparator.comparing(Course::amountsOfEnrolledStudents));
-        try {
-            Course leastPopularEntry = leastPopular.orElseThrow(NullPointerException::new);
-            returnString = leastPopularEntry.getCourseName().label;
-        } catch (NullPointerException e) {
+                .mapToInt(Course::amountsOfEnrolledStudents)
+                .max()
+                .orElse(-1);
+        List<String> courseNamesList = currentCoursesMap.values()
+                .stream()
+                .filter(c -> c.amountsOfEnrolledStudents() == leastEnrolledStudents)
+                .map(c -> c.getCourseName().label)
+                .toList();
+        if (courseNamesList.size() > 1) {
             returnString = "N/A";
+        } else {
+            returnString = courseNamesList.get(0);
         }
         return returnString;
     }
 
     public String calculateHighestActivity() {
-        Optional<Course> highestActivityOptional = currentCoursesMap.values().stream()
-                .max(Comparator.comparing((course) -> {
-                    int totalAssignments = 0;
-                    for (Student student : course.getEnrolledStudents()) {
-                        for (CourseNames name : CourseNames.values()) {
-                            totalAssignments = totalAssignments + student.getPoints().getCourseAssignments(name);
-                        }
-                    }
-                    return totalAssignments;
-                }));
-        String returnString;
-        try {
-            Course highestActivity = highestActivityOptional.orElseThrow(NullPointerException::new);
-            returnString = highestActivity.getCourseName().label;
-        } catch (NullPointerException e) {
-            returnString = "N/A";
-        }
-        return returnString;
+        int highestTotalAssignments = currentCoursesMap.values()
+                .stream()
+                .mapToInt(Course::getTotalAssignmentsForCourse)
+                .max()
+                .orElse(-1);
+        return currentCoursesMap.values()
+                .stream()
+                .filter(c -> c.getTotalAssignmentsForCourse() == highestTotalAssignments)
+                .map(c -> c.getCourseName().label)
+                .collect(Collectors.joining(", "));
     }
 
     public String calculateLowestActivity() {

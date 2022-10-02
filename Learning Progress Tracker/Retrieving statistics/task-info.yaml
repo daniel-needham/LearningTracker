@@ -1383,21 +1383,21 @@ files:
 feedback_link: https://hyperskill.org/learn/step/14399#comment
 status: Failed
 feedback:
-  message: "Wrong answer in test #35\n\nExpected most popular: Java, DSA, Databases,\
-    \ Spring, but your output was: Most popular: Databases\n\nPlease find below the\
-    \ output of your program during this failed test.\nNote that the &#39;&gt;&#39;\
-    \ character indicates the beginning of the input line.\n\n---\n\nLearning Progress\
-    \ Tracker\n&gt; add students\nEnter student credentials or &#39;back&#39; to return:\n\
-    &gt; Ricki Trovillion address1@mail.com\nThe student has been added.\n&gt; Olga\
-    \ Rosanne address2@mail.com\nThe student has been added.\n&gt; Annecorinne Ause\
-    \ address3@mail.com\nThe student has been added.\n&gt; Nonna Miko address4@mail.com\n\
-    The student has been added.\n&gt; back\nTotal 4 students have been added\n&gt;\
-    \ list\nStudents:\n1001\n1002\n1003\n1004\n&gt; add points\nEnter an id and points\
-    \ or &#39;back&#39; to return\n&gt; 1001 5 4 3 1\nPoints updated\n&gt; 1002 5\
-    \ 4 3 1\nPoints updated\n&gt; 1003 5 4 3 1\nPoints updated\n&gt; 1004 5 4 3 1\n\
-    Points updated\n&gt; back\n&gt; statistics\nType the name of a course to see details\
-    \ or &#39;back&#39; to quit:\nMost popular: Databases \nLeast popular: Databases\
-    \ \nHighest activity: Databases \nLowest activity: Databases \nEasiest course:\
+  message: "Wrong answer in test #35\n\nExpected lowest activity: n/a, but your output\
+    \ was: Lowest activity: Java\n\nPlease find below the output of your program during\
+    \ this failed test.\nNote that the &#39;&gt;&#39; character indicates the beginning\
+    \ of the input line.\n\n---\n\nLearning Progress Tracker\n&gt; add students\n\
+    Enter student credentials or &#39;back&#39; to return:\n&gt; Olga Rosanne address1@mail.com\n\
+    The student has been added.\n&gt; Gwenette Anagnos address2@mail.com\nThe student\
+    \ has been added.\n&gt; Barbara-Anne Chicky address3@mail.com\nThe student has\
+    \ been added.\n&gt; Francesca Francis address4@mail.com\nThe student has been\
+    \ added.\n&gt; back\nTotal 4 students have been added\n&gt; list\nStudents:\n\
+    1001\n1002\n1003\n1004\n&gt; add points\nEnter an id and points or &#39;back&#39;\
+    \ to return\n&gt; 1001 5 4 3 1\nPoints updated\n&gt; 1002 5 4 3 1\nPoints updated\n\
+    &gt; 1003 5 4 3 1\nPoints updated\n&gt; 1004 5 4 3 1\nPoints updated\n&gt; back\n\
+    &gt; statistics\nType the name of a course to see details or &#39;back&#39; to\
+    \ quit:\nMost popular: Java, Databases, Spring, DSA \nLeast popular: N/A \nHighest\
+    \ activity: Java, Databases, Spring, DSA \nLowest activity: Java \nEasiest course:\
     \ Java \nHardest course: Spring"
-  time: Sat, 01 Oct 2022 08:10:28 UTC
+  time: Sun, 02 Oct 2022 08:20:37 UTC
 record: -1

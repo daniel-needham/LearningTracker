@@ -28,4 +28,14 @@ public class Course {
     public List<Student> getEnrolledStudents() {
         return enrolledStudents;
     }
+
+    public int getTotalAssignmentsForCourse() {
+        int totalAssignments= 0;
+        for (Student student : getEnrolledStudents()) {
+            for (CourseNames name : CourseNames.values()) {
+                totalAssignments = totalAssignments + student.getPoints().getCourseAssignments(name);
+            }
+        }
+        return totalAssignments;
+    }
 }
