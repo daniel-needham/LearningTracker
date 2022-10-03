@@ -7,7 +7,7 @@ public class Student {
     private final String lastName;
     private final String email;
 
-    private CoursePoints points;
+    private final CoursePoints points;
 
 
     public Student(String firstName,

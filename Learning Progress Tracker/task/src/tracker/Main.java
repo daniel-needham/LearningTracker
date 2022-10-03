@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args) {
         StudentManager studentManager = new StudentManager();
         Statistics statistics = new Statistics(studentManager);
+        Notify notify = new Notify(studentManager);
         Scanner scanner = new Scanner(System.in);
         System.out.println("Learning Progress Tracker");
         entryLoop:
@@ -45,6 +46,11 @@ public class Main {
             //statistics
             if (Objects.equals(command.toLowerCase(), "statistics")) {
                 statistics.startCommandLineInterface(scanner);
+                continue;
+            }
+            //notify
+            if (Objects.equals(command.toLowerCase(), "notify")) {
+                notify.printStudentsToNotify();
                 continue;
             }
             //exit

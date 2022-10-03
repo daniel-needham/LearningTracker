@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CoursePoints {
 
-    private HashMap<CourseNames, int[]> coursesPointsMap;
+    private final HashMap<CourseNames, int[]> coursesPointsMap;
 
     public CoursePoints() {
         coursesPointsMap = new HashMap<>(4);
@@ -15,6 +15,7 @@ public class CoursePoints {
         }
     }
 
+    //returns an array of course student has been enrolled on
     public ArrayList<CourseNames> addPointsFromArray(int[] points) throws IllegalArgumentException {
         ArrayList<CourseNames> enrolledCourses = new ArrayList<>();
         int numberOfCourses = CourseNames.values().length;

@@ -1035,65 +1035,6 @@ files:
         }
     }
   learner_created: false
-- name: test/tracker/studentManagerTest.java
-  visible: true
-  text: |-
-    package tracker;
-
-    import org.junit.jupiter.api.Assertions;
-    import org.junit.jupiter.api.Test;
-    import org.junit.jupiter.params.ParameterizedTest;
-    import org.junit.jupiter.params.provider.CsvSource;
-
-    class studentManagerTest {
-
-        studentManager sm = new studentManager();
-
-        @ParameterizedTest(name = "{index} => {0} == true")
-        @CsvSource({"Steve", "Steve-sing", "Stevey's"})
-        void testFirstNameMatchTrue(String name) {
-            Assertions.assertTrue(studentManager.matchFirstName(name));
-
-        }
-
-        @ParameterizedTest(name = "{index} => {0} == false")
-        @CsvSource({"'", "S.", ".", "1313131", "tom-"})
-        void testFirstNameMatchFalse(String name) {
-            Assertions.assertFalse(studentManager.matchFirstName(name));
-
-        }
-
-        @ParameterizedTest(name = "{index} => {0} == true")
-        @CsvSource({"O'reilly", "Reilly", "Double-barrel", "cheese stick", "c-heese 'stick oman"})
-        void testLastNameMatchTrue(String name) {
-            Assertions.assertTrue(studentManager.matchLastName(name));
-
-        }
-
-        @ParameterizedTest(name = "{index} => {0} == false")
-        @CsvSource({"-eese 'stick oman", "a", "supa'", "1313131"})
-        void testLastNameMatchFalse(String name) {
-            Assertions.assertFalse(studentManager.matchLastName(name));
-
-        }
-
-        @ParameterizedTest(name = "{index} => {0} == true")
-        @CsvSource({"steve50@gmail.com", "danielneedhamdn@gmail.com", "bing@bong.com", "niceguy50@msn.com"})
-        void testEmailMatchTrue(String name) {
-            Assertions.assertTrue(studentManager.matchEmail(name));
-
-        }
-
-        @ParameterizedTest(name = "{index} => {0} == false")
-        @CsvSource({"-eese 'stick oman", "a", "supa'", "1313131", "something@gmailcom"})
-        void testEmailMatchFalse(String name) {
-            Assertions.assertFalse(studentManager.matchEmail(name));
-
-        }
-
-
-    }
-  learner_created: false
 - name: test/tracker/InputMatchTest.java
   visible: true
   text: |-
@@ -1307,6 +1248,11 @@ files:
         @Test
         void returnTopLearnersTestTest() {
             assertEquals("100110021003", statistics.returnTopLearnersTest(CourseNames.SPRING));
+        }
+
+        @Test
+        void printTopLearnersTest() {
+            statistics.printTopLearners(CourseNames.JAVA);
         }
     }
   learner_created: false
@@ -2012,6 +1958,19 @@ files:
         }
     }
   learner_created: true
+- name: src/tracker/Notify.java
+  visible: true
+  learner_created: true
+- name: src/tracker/NotificationPair.java
+  visible: true
+  learner_created: true
+- name: test/tracker/NotifyTest.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/14400#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: Mon, 03 Oct 2022 12:18:36 UTC
 record: -1
