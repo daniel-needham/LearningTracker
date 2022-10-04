@@ -10,6 +10,15 @@ public class Main {
         Notify notify = new Notify(studentManager);
         Scanner scanner = new Scanner(System.in);
         System.out.println("Learning Progress Tracker");
+        System.out.println("Please use the following commands: \n" +
+                "add students\n" +
+                "add points\n" +
+                "list\n" +
+                "find\n" +
+                "statistics\n" +
+                "notify\n" +
+                "commands - to see this list again \n" +
+                "exit");
         entryLoop:
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -51,6 +60,18 @@ public class Main {
             //notify
             if (Objects.equals(command.toLowerCase(), "notify")) {
                 notify.printStudentsToNotify();
+                continue;
+            }
+            if (Objects.equals(command.toLowerCase(), "commands")) {
+                System.out.println("Please use the following commands: \n" +
+                        "add students\n" +
+                        "add points\n" +
+                        "list\n" +
+                        "find\n" +
+                        "statistics\n" +
+                        "notify\n" +
+                        "commands - to see this list again \n" +
+                        "exit");
                 continue;
             }
             //exit

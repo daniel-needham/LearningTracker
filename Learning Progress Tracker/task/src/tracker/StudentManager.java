@@ -90,6 +90,7 @@ public class StudentManager {
 
     public void addPointsFromCommandLine(Scanner scanner) {
         System.out.println("Enter an id and points or 'back' to return");
+        System.out.println("Please enter points in the format id points points points points");
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
 
@@ -128,7 +129,7 @@ public class StudentManager {
     }
 
     public void findStudentFromCommandLine(Scanner scanner) {
-        System.out.println("Enter an id and points or 'back' to return");
+        System.out.println("Enter an id or 'back' to return");
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
 
