@@ -2,6 +2,8 @@ package tracker;
 
 import java.io.FilterOutputStream;
 import java.util.*;
+import static java.util.stream.Collectors.toList;
+
 
 public class Notify {
 
@@ -16,8 +18,7 @@ public class Notify {
     public void printStudentsToNotify() {
         populateListOfCompletedStudents();
         List<NotificationPair> needToNotifyList = listOfCompletedStudents.stream()
-                .filter((tuple) -> !tuple.notified())
-                .toList();
+                .filter((tuple) -> !tuple.notified()).collect(toList());
         needToNotifyList.forEach((notificationPair -> {
             System.out.printf("To: %s \nRe: Your Learning Progress\nHello, %s %s! You have accomplished our %s course!",
                     notificationPair.getStudent().getEmail(),notificationPair.getStudent().getFirstName(),

@@ -1,3 +1,11 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClassName = 'com.tracker.Main'
+}
+
 repositories {
     mavenCentral()
 }

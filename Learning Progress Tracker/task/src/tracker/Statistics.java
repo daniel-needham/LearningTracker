@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toList;
 
 
 public class Statistics {
@@ -36,14 +37,8 @@ public class Statistics {
             hardestCourse = calculateHardestCourse();
         }
         System.out.println("Type the name of a course to see details or 'back' to quit:");
-        System.out.println(String.format("""
-                        Most popular: %s\s
-                        Least popular: %s\s
-                        Highest activity: %s\s
-                        Lowest activity: %s\s
-                        Easiest course: %s\s
-                        Hardest course: %s""",
-                mostPop, leastPop, highestActiv, lowestActiv, easiestCourse, hardestCourse));
+        System.out.printf("Most popular: %s Least popular: %s Highest activity: %s Lowest activity: %s Easiest course: %s Hardest course: %s%n",
+                mostPop, leastPop, highestActiv, lowestActiv, easiestCourse, hardestCourse);
 
         inputRead: while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -89,8 +84,7 @@ public class Statistics {
         List<String> courseNamesList = currentCoursesMap.values()
                 .stream()
                 .filter(c -> c.amountsOfEnrolledStudents() == leastEnrolledStudents)
-                .map(c -> c.getCourseName().label)
-                .toList();
+                .map(c -> c.getCourseName().label).collect(toList());
         if (courseNamesList.size() > 1) {
             returnString = "n/a";
         } else {
@@ -122,8 +116,7 @@ public class Statistics {
         List<String> lowestActivityAsStrings = currentCoursesMap.values()
                 .stream()
                 .filter(c -> c.getTotalAssignmentsForCourse() == lowestTotalAssignments)
-                .map(c -> c.getCourseName().label)
-                .toList();
+                .map(c -> c.getCourseName().label).collect(toList());
         if (lowestActivityAsStrings.size() > 1) {
             returnString = "n/a";
         } else {
