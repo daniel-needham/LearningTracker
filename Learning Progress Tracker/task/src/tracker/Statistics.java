@@ -37,7 +37,12 @@ public class Statistics {
             hardestCourse = calculateHardestCourse();
         }
         System.out.println("Type the name of a course to see details or 'back' to quit:");
-        System.out.printf("Most popular: %s Least popular: %s Highest activity: %s Lowest activity: %s Easiest course: %s Hardest course: %s%n",
+        System.out.printf("Most popular: %s\n" +
+                        "Least popular: %s\n" +
+                        "Highest activity: %s\n" +
+                        "Lowest activity: %s\n" +
+                        "Easiest course: %s\n" +
+                        "Hardest course: %s%n",
                 mostPop, leastPop, highestActiv, lowestActiv, easiestCourse, hardestCourse);
 
         inputRead: while (scanner.hasNextLine()) {

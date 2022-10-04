@@ -10,6 +10,7 @@ public class Main {
         Notify notify = new Notify(studentManager);
         Scanner scanner = new Scanner(System.in);
         System.out.println("Learning Progress Tracker");
+        System.out.println("----------------------------------");
         System.out.println("Please use the following commands: \n" +
                 "add students\n" +
                 "add points\n" +
