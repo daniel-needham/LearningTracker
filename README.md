@@ -25,3 +25,30 @@ Due to Hyperskill releasing requirements of the project in stages, I do feel tha
 
 <h2>Demo</h2>
 
+**Adding students to the program**
+<p>
+  
+![](markdown_gifs/add_student.gif "Adding students")
+  
+  </p>
+  
+  **Example of regex rules for checking appropriate names and emails are entered**
+<p>
+  
+![](markdown_gifs/regex_example.gif "Regex example")
+  
+  </p>
+
+  **Points can be added for each of a students modules - with statistics displaying certain metrics**
+<p>
+  
+![](markdown_gifs/points_lookup.gif "Points lookup")
+  
+  </p>
+  
+   **Once a threshold of points has been surpassed - we can notify passing students of each module**
+<p>
+  
+![](markdown_gifs/notify.gif "Pass notification")
+  
+  </p>
